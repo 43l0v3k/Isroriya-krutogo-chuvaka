@@ -58,6 +58,9 @@ jobs:
       - name: Import project resources
         run: godot --headless --editor --path . --quit
 
+      - name: Install Android build template
+        run: godot --headless --editor --path . --install-android-build-template --quit
+
       - name: Export debug APK
         run: |
           mkdir -p build
