@@ -58,13 +58,10 @@ jobs:
       - name: Import project resources
         run: godot --headless --editor --path . --quit
 
-      - name: Install Android build template
-        run: godot --headless --editor --path . --install-android-build-template --quit
-
-      - name: Export debug APK
+      - name: Install Android build template and export debug APK
         run: |
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/istoriya-krutogo-chuvaka-debug.apk
+          godot --headless --path . --install-android-build-template --export-debug "Android" build/istoriya-krutogo-chuvaka-debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
