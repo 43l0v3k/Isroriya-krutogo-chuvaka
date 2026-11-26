@@ -34,18 +34,20 @@ jobs:
             "ndk;23.2.8568313" \
             "cmake;3.10.2.4988404"
 
-      - name: Download Godot 4.3 and export templates
+      - name: Install Godot 4.3 and export templates
         run: |
           mkdir -p "$HOME/.local/share/godot/export_templates/4.3.stable"
-          curl -L "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip" -o godot.zip
+          curl --fail --location --retry 3 "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip" -o godot.zip
           unzip -q godot.zip -d godot-bin
           sudo install -m 0755 godot-bin/Godot_v4.3-stable_linux.x86_64 /usr/local/bin/godot
-          curl -L "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz" -o templates.tpz
+          curl --fail --location --retry 3 "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz" -o templates.tpz
           mkdir templates-unpacked
           unzip -q templates.tpz -d templates-unpacked
           cp -a templates-unpacked/templates/. "$HOME/.local/share/godot/export_templates/4.3.stable/"
+          test -s "$HOME/.local/share/godot/export_templates/4.3.stable/android_debug.apk"
+          test -s "$HOME/.local/share/godot/export_templates/4.3.stable/android_release.apk"
 
-      - name: Configure Android paths for Godot
+      - name: Configure Android SDK paths
         run: |
           mkdir -p "$HOME/.config/godot"
           cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
@@ -55,18 +57,22 @@ jobs:
           export/android/java_sdk_path = "$JAVA_HOME"
           EOF
 
-      - name: Import project resources
-        run: godot --headless --editor --path . --quit
+      - name: Import and validate Godot project
+        run: godot --headless --editor --path . --import --quit --verbose
 
-      - name: Install Android build template and export debug APK
+      - name: Install Android build template
+        run: godot --headless --editor --path . --install-android-build-template --quit --verbose
+
+      - name: Export debug APK
         run: |
           mkdir -p build
-          godot --headless --path . --install-android-build-template --export-debug "Android" build/istoriya-krutogo-chuvaka-debug.apk
+          godot --headless --editor --path . --export-debug "Android" build/istoriya-krutogo-chuvaka-debug.apk --verbose
+          test -s build/istoriya-krutogo-chuvaka-debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: istoriya-krutogo-chuvaka-debug-apk
-          path: build/*.apk
+          path: build/istoriya-krutogo-chuvaka-debug.apk
           if-no-files-found: error
           retention-days: 14
