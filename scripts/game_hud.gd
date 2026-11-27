@@ -101,6 +101,9 @@ func _ready() -> void:
 func _toggle_phone() -> void:
     phone_panel.visible = not phone_panel.visible
 
+func toggle_phone() -> void:
+    _toggle_phone()
+
 func _next_meme() -> void:
     meme_index = (meme_index + 1) % memes.size()
     meme_label.text = memes[meme_index]
