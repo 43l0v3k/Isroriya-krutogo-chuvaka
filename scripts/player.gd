@@ -9,7 +9,7 @@ extends CharacterBody3D
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var camera_pivot: Node3D
 var mobile_controls: Control
-var game_hud: CanvasLayer
+var game_hud
 var yaw := 0.0
 var pitch := -0.18
 var mobile_move := Vector2.ZERO
